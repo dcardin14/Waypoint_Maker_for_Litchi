@@ -7,7 +7,6 @@
 #include<cstdlib>
 using namespace std;
 
-//New Comment to test GitHub
 
 double get_lat_ratio(double);
 double get_long_ratio(double);
