@@ -1,0 +1,4 @@
+POBlat		POBlong
+
+NS_Elements	NS_Spacing
+EW_Elements	EW_Spacing
