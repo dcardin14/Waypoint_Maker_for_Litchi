@@ -28,6 +28,7 @@ int main()
      int ew_spacing;
     
 	inputFile.open("waypoint_parameters.txt");
+	inputFile << POBlat << POBlong;
     cout << "SOFTWARE BY DANIEL CARDIN\nCOPYRIGHT 2019\nALL RIGHTS RESERVED\n\n";
 	
 	        
@@ -53,12 +54,9 @@ if(POBlong > 0)
 				xratio = get_long_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
 				yratio = get_lat_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
           
-	array_size = 0;
-    while(!inputFile.eof())
-	{
-    	inputFile >> NSbearing >> Degrees >> Minutes >> Seconds >> EWbearing >> distance;
+    	inputFile >> ns_elements >> ns_spacing >> ew_elements >> ew_spacing;
     	array_size++;
-    }
+
     cout << "Your array size is: " << array_size << ". " << endl;
     double x_array[array_size], y_array[array_size];  // 05-29-2014 DC:  Create parallel arrays to hold x and y values
     inputFile.close();  //  05-29-2014 DC:  This is so I can start back at the beginning.  There's probably a better way to reset the cursor...
