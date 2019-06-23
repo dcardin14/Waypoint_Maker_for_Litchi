@@ -2,7 +2,6 @@
 #include<string>
 #include<fstream>
 #include <iomanip>
-#include<math.h>
 #include<ctime>
 #include<cstdlib>
 using namespace std;
@@ -10,8 +9,6 @@ using namespace std;
 
 double get_lat_ratio(double);
 double get_long_ratio(double);
-
-bool authenticate_license();
 
 double cumulative_square_footage = 0,cumulative_acreage = 0, previous_y = 0;
 int array_size;
@@ -22,45 +19,16 @@ int main()
     ifstream inputFile;
     ofstream outputFile;
                    
-                // Declare constants
-                const double PI = 3.14159265358979323;
-               
-                
     // Declare variables to hold the input read from the file
-    string NSbearing, EWbearing, units, unit_Choice, oil_and_gas_play;    
-    double Degrees, Minutes, Seconds, distance, POBlat,POBlong, lat, long_, decimalDegrees, azimuthDegrees, aRadians, hypotenuseInFeet, xInFeetToBeAdded, 
-                                                yInFeetToBeAdded, xInDegreesOfLongToBeAdded, yInDegreesOfLatToBeAdded, xratio, yratio;
-											
-         
-/*                
-                    while(authenticate_license() == 0)
-					{
-						cout << "Your license for this product has expired.  Please contact \nDaniel Cardin at (720) 440-1741 or dcardin@cardinoil.com \nfor a renewal.\n\n";
-						system("pause");
-                    }
-*/
-					           
-				cout << "What units are used in your data?\n\n";
-				cout << "(f) Feet\n";
-				cout << "(v) Varas\n";
-				cout << "(r) Rods\n";
-				cout << "(c) Chains\n";
-				cout << "(p) Poles\n";
-				cout << "(y) Yards\n";
-                cin >> unit_Choice;
-						
-				
-	                     
-    //
-    inputFile.open("MB.txt");
-    cout << "SOFTWARE BY DANIEL CARDIN\nCOPYRIGHT 2013\nALL RIGHTS RESERVED\n\n";
+     double POBlat;
+     double POBlong;
+     int ns_elements;
+     int ns_spacing;
+     int ew_elements;
+     int ew_spacing;
     
-    //      05-29-2014 DC:  I'm going to loop through the MB file twice:  Once to count the number of MB calls to use as the size of an array to put the 
-    //      lat/longs in and the second time to calculate the acreage of the resulting polygon so I can use that data in the KML to increase
-    //      the richness of my content.  What's unfortunate is that I don't seem to be calculating acreage exactly correctly.  More complicated
-    //      polygons are off by 3 or 4 percent on acreage, which is obviously unnacceptable long term.  I suspect it's some kind of rounding error.
-    
-	inputFile >> POBlat >> POBlong;
+	inputFile.open("waypoint_parameters.txt");
+    cout << "SOFTWARE BY DANIEL CARDIN\nCOPYRIGHT 2019\nALL RIGHTS RESERVED\n\n";
 	
 	        
 if(POBlat < 25 || POBlat > 50 || POBlong > -60 || POBlong < -125)  //  Check for out of bounds
@@ -68,8 +36,6 @@ if(POBlat < 25 || POBlat > 50 || POBlong > -60 || POBlong < -125)  //  Check for
 
 	cout << "Your data appears to have a Point of Beginning that is outside the Continental \nUnited States.  ";
 	cout << "If this is an error, please correct the POB and rerun the \nprogram. ";
-	cout <<  "If it's not an error, please contact Petroleum Data Services, Inc. \nfor an international license.\n\n\n\n";
-	system("pause");
 	
 }
 
@@ -79,7 +45,7 @@ if(POBlong > 0)
 	POBlong = 0-POBlong;
 }
 
-//  Now set the x_long_degrees_per_foot and Y_lat_degrees_per_foot based on the area
+//  Now set the x_long_degrees_per_foot and Y_lat_degrees_per_foot based on the vicinity
 // First I'll initialize the values to zero
 				xratio = 0; 				 
 				yratio = 0;
@@ -109,60 +75,7 @@ if(POBlong > 0)
        
         //calculate the decimal degrees from the degrees, minutes, and seconds in the deed
         decimalDegrees = Degrees + (Minutes/60)+(Seconds/60);
-        
-                                                //This set of nested "if" statements uses the bearing calls to turn the degrees into azimuth degrees
-                                                if (NSbearing == "N" || NSbearing == "n" || NSbearing == "8")
-                                                {
-                                                                if (EWbearing == "E" || EWbearing =="e" || EWbearing == "6")
-                                                                {              
-                                                                                azimuthDegrees = decimalDegrees;
-                
-                                                                }
-                                                                else if (EWbearing == "W" || EWbearing == "w" || EWbearing == "4")
-                                                                {
-                                                                                azimuthDegrees = 360-decimalDegrees;
-                                                                }
-                                                                //trailing else to handle incorrect input? (add later)
-                                                }
-                                                else if (NSbearing == "S" || NSbearing == "s" || NSbearing == "2")
-                                                {
-
-                                                                if (EWbearing == "E" || EWbearing == "e" || EWbearing == "6")
-                                                                {              
-                                                                                azimuthDegrees = 180-decimalDegrees;
-                
-                                                                }
-                                                                else if (EWbearing == "W" || EWbearing == "w" || EWbearing == "4")
-                                                                {
-                                                                                azimuthDegrees = 180+decimalDegrees;
-                                                                }
-                                                                //trailing else to handle incorrect input? (add later)
-                
-                                                }
-                                                //trailing else to handle incorrect input? (add later)
-                                              
-                                                
-                                                //convert azimuthDegrees into radians
-                                                aRadians = azimuthDegrees * PI/180.0;
-                                                
-                                                //find out how long the vector call is in feet (regardless of whether the call itself is in feet or varas)
-                                              	//05-24-2014  I'm not too sure about putting all this in the loop, but I'm
-												 //going to try it								
-												if(unit_Choice == "f"|| unit_Choice == "F"){hypotenuseInFeet = distance;}
-												if(unit_Choice == "v"|| unit_Choice == "V"){hypotenuseInFeet = distance * 2.77778333333;}
-												if(unit_Choice == "r"|| unit_Choice == "R"){hypotenuseInFeet = distance * 16.5;}
-												if(unit_Choice == "c"|| unit_Choice == "C"){hypotenuseInFeet = distance * 66;}
-												if(unit_Choice == "p"|| unit_Choice == "P"){hypotenuseInFeet = distance * 16.5;}
-												if(unit_Choice == "y"|| unit_Choice == "Y"){hypotenuseInFeet = distance * 3;}
-											                                                
-                                                //calculate the x and y in feet to be added
-                                                xInFeetToBeAdded = sin(aRadians) * hypotenuseInFeet;
-                                                yInFeetToBeAdded = cos(aRadians) * hypotenuseInFeet;
-                                                
-                                                //calculate the y(lat) and x(long) to be added
-                                                xInDegreesOfLongToBeAdded = (xInFeetToBeAdded * xratio); 
-                                                yInDegreesOfLatToBeAdded = (yInFeetToBeAdded * yratio);
-                                                
+                  
     x_array[(count + 1)] = x_array[(count)] + xInDegreesOfLongToBeAdded;  //  05-29-2014  DC:  Put the x coordinate into an array element whose index is set by the count.
     y_array[(count + 1)] = y_array[(count)] + yInDegreesOfLatToBeAdded;  //  05-29-2014  DC:  Put the y coordinate into an array element whose index is set by the count.
     
