@@ -55,33 +55,35 @@ if(POBlong > 0)
 				yratio = get_lat_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
           
     	inputFile >> ns_elements >> ns_spacing >> ew_elements >> ew_spacing;
-    	array_size++;
+	array_size = ns_elements * ew_elements;
 
     cout << "Your array size is: " << array_size << ". " << endl;
-    double x_array[array_size], y_array[array_size];  // 05-29-2014 DC:  Create parallel arrays to hold x and y values
-    inputFile.close();  //  05-29-2014 DC:  This is so I can start back at the beginning.  There's probably a better way to reset the cursor...
-    inputFile.open("MB.txt");
-    //  05-29-2014 DC:  Now loop through and actually put the values in the array.
-    inputFile >> POBlat >> POBlong;
-    x_array[0] = POBlong;
-    y_array[0] = POBlat;
+    //double x_array[array_size], y_array[array_size];  // 05-29-2014 DC:  Create parallel arrays to hold x and y values
+    //06-23-2019 DC:  instead of parallell arrays, I'm going to use a 2-dimensional array
+    //06-23-2019 DC:  NOPE...That turned out to be wrong as fuck.  I need PARALLEL 2-DIMENSIONAL ARRAYS!!!!  The 2-dimensional part is for the grid
+    //and the parallel part is for the fact that I need both x and y coordinates.  I guess I could use a 3 dimensional array, but it doesn't seem like the way
+    //to do it to me at this moment.
+   double long_lat_array[ew_elements][ns_elements]; 
     
-	for(int count = 0; count < array_size-1; count++)
+    //  06-23-2019 DC:  The first set of points is the POB
+   long_lat_array[0][0] = 
+   
+	for(int count = 0; count < ew_elements-1; count++)
 	{
-	  // Get the metes and bounds calls from the MB file
-	  inputFile >> NSbearing >> Degrees >> Minutes >> Seconds >> EWbearing >> distance;
-       
-        //calculate the decimal degrees from the degrees, minutes, and seconds in the deed
-        decimalDegrees = Degrees + (Minutes/60)+(Seconds/60);
-                  
-    x_array[(count + 1)] = x_array[(count)] + xInDegreesOfLongToBeAdded;  //  05-29-2014  DC:  Put the x coordinate into an array element whose index is set by the count.
-    y_array[(count + 1)] = y_array[(count)] + yInDegreesOfLatToBeAdded;  //  05-29-2014  DC:  Put the y coordinate into an array element whose index is set by the count.
+		for(int count_a = 0; count_a < ns_elements-1; count_a++)
+		{
+		
+			
+		
+		}
+		
+    		x_array[(count + 1)] = x_array[(count)] + xInDegreesOfLongToBeAdded;  //  05-29-2014  DC:  Put the x coordinate into an array element whose index is set by the count.
+    		y_array[(count + 1)] = y_array[(count)] + yInDegreesOfLatToBeAdded;  //  05-29-2014  DC:  Put the y coordinate into an array element whose index is set by the count.
     
 	}
-	x_array[array_size] = POBlong;  //The last x in the array should be the x for the POB
-	y_array[array_size] = POBlat;   //The last x in the array should be the x for the POB
-	
+
     inputFile.close();  // 05-29-2014 DC:  Start again to reset the cursor.
+
     inputFile.open("MB.txt");
     system("pause");
     
